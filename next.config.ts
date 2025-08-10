@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  ...(process.env.NGROK_DOMAIN && {
+    allowedDevOrigins: [process.env.NGROK_DOMAIN]
+  })
 };
 
 export default nextConfig;

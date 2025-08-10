@@ -2,6 +2,17 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### Environment Variables
+
+Create a `.env.local` file in the root directory and configure the following variables:
+
+```bash
+# Optional: Set your ngrok domain to allow cross-origin requests during development
+NGROK_DOMAIN=your-ngrok-domain.ngrok-free.app
+```
+
+### Running the Development Server
+
 First, run the development server:
 
 ```bash
