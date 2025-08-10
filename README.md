@@ -1,4 +1,4 @@
-This repository implements a multi-user app that uses tool-level auth with Arcade.dev
+This repository implements a multi-user app that uses tool-level auth with Arcade.dev, implementing a [custom user verifier](https://docs.arcade.dev/home/auth/secure-auth-production#build-a-custom-user-verifier).
 
 ## Getting Started
 
@@ -25,6 +25,10 @@ ARCADE_API_KEY=<your Arcade API key>
 # Optional: Set your ngrok domain to allow cross-origin requests during development
 NGROK_DOMAIN=<your ngrok domain>
 ```
+
+### Configure the verifier on your Arcade Dashboard
+
+The verifier in this project will work only if you [configure the verifier route](https://docs.arcade.dev/home/auth/secure-auth-production#add-your-custom-verifier-route-to-arcade) on the Arcade Dashboard.
 
 ### Running the Development Server
 
