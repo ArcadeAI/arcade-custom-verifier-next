@@ -6,13 +6,16 @@ import { redirect } from "next/navigation"
 import { Arcade } from "@arcadeai/arcadejs"
 
 export async function GET(request: NextRequest) {
-  // Get user from Supabase
-  const supabase = await createClient()
-  const { data, error } = await supabase.auth.getUser()
-
   // Extract flow_id from query parameters
   const { searchParams } = new URL(request.url)
   const flowId = searchParams.get('flow_id')
+  if (!flowId) {
+    return NextResponse.json({ error: 'flow_id parameter is required' }, { status: 400 })
+  }
+
+  // Get user from Supabase
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.getUser()
 
   if (error || !data?.user) {
     // If user is not authenticated, redirect to login with flow_id as redirect parameter
@@ -25,25 +28,21 @@ export async function GET(request: NextRequest) {
     redirect(loginUrl.toString())
   }
   // If user is authenticated and we have a flow_id, proceed with verification logic
-  if (flowId) {
-    const arcade = new Arcade({
-      apiKey: process.env.ARCDE_API_KEY,
+  const arcade = new Arcade({
+    apiKey: process.env.ARCDE_API_KEY,
+  })
+
+  try{
+    const response = await arcade.auth.confirmUser({
+      flow_id: flowId,
+      user_id: data.user.id,
     })
 
-    try{
-      const response = await arcade.auth.confirmUser({
-        flow_id: flowId,
-        user_id: data.user.id,
-      })
+    await arcade.auth.waitForCompletion(response.auth_id);
 
-      await arcade.auth.waitForCompletion(response.auth_id);
-
-    } catch (error) {
-      console.error(error)
-      return NextResponse.json({ error: 'Failed to verify flow' }, { status: 500 })
-    }
-    redirect('/');
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json({ error: 'Failed to verify flow' }, { status: 500 })
   }
-  // If no flow_id provided, return error or redirect
-  return NextResponse.json({ error: 'flow_id parameter is required' }, { status: 400 })
+  redirect('/');
 }
