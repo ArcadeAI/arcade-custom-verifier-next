@@ -6,6 +6,7 @@ import { redirect } from "next/navigation"
 import { Arcade } from "@arcadeai/arcadejs"
 
 export async function GET(request: NextRequest) {
+  // Get user from Supabase
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
 
@@ -30,21 +31,16 @@ export async function GET(request: NextRequest) {
     })
 
     try{
-        const response = await arcade.auth.confirmUser({
-            flow_id: flowId,
-            user_id: data.user.id,
-        })
+      const response = await arcade.auth.confirmUser({
+        flow_id: flowId,
+        user_id: data.user.id,
+      })
 
-        let authId = response.auth_id;
-        if (!authId.startsWith('ar_')) {
-            authId = 'ar_' + authId;
-        }
-
-        const auth_response = await arcade.auth.waitForCompletion(authId);
+      await arcade.auth.waitForCompletion(response.auth_id);
 
     } catch (error) {
-        console.error(error)
-        return NextResponse.json({ error: 'Failed to verify flow' }, { status: 500 })
+      console.error(error)
+      return NextResponse.json({ error: 'Failed to verify flow' }, { status: 500 })
     }
     redirect('/');
   }
